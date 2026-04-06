@@ -1,6 +1,7 @@
 package com.beepmetoo.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -28,7 +29,7 @@ object Routes {
 }
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, startRoute: String? = null) {
     NavHost(navController = navController, startDestination = Routes.HOME) {
 
         composable(Routes.HOME) {
@@ -85,6 +86,13 @@ fun NavGraph(navController: NavHostController) {
             ExportScreen(
                 onBack = { navController.popBackStack() },
             )
+        }
+    }
+
+    // Navigate to the record screen if launched from a beep notification
+    if (startRoute != null) {
+        LaunchedEffect(startRoute) {
+            navController.navigate(startRoute)
         }
     }
 }

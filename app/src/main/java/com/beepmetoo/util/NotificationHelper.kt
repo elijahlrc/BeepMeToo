@@ -12,7 +12,6 @@ import com.beepmetoo.ui.MainActivity
 object NotificationHelper {
 
     private const val CHANNEL_ID = "beep_channel"
-    private const val NOTIFICATION_ID = 1001
 
     fun createChannel(context: Context) {
         val channel = NotificationChannel(
@@ -27,16 +26,18 @@ object NotificationHelper {
         manager.createNotificationChannel(channel)
     }
 
-    fun showBeepNotification(context: Context) {
+    fun showBeepNotification(context: Context, beepId: Long) {
         createChannel(context)
 
+        val beepTimestamp = System.currentTimeMillis()
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra("beepTimestamp", System.currentTimeMillis())
+            putExtra(EXTRA_BEEP_TIMESTAMP, beepTimestamp)
+            putExtra(EXTRA_BEEP_ID, beepId)
         }
         val pendingIntent = PendingIntent.getActivity(
             context,
-            0,
+            beepId.toInt(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
@@ -48,9 +49,13 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()
 
         val manager = context.getSystemService(NotificationManager::class.java)
-        manager.notify(NOTIFICATION_ID, notification)
+        manager.notify(beepId.toInt(), notification)
     }
+
+    const val EXTRA_BEEP_TIMESTAMP = "beepTimestamp"
+    const val EXTRA_BEEP_ID = "beepId"
 }

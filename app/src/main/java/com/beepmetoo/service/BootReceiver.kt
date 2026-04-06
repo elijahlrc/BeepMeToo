@@ -3,11 +3,31 @@ package com.beepmetoo.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.beepmetoo.data.db.dao.ScheduledBeepDao
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BootReceiver : BroadcastReceiver() {
+
+    @Inject lateinit var scheduledBeepDao: ScheduledBeepDao
+    @Inject lateinit var beepScheduler: BeepScheduler
+
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            // TODO: reschedule alarms from active timer profile
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
+
+        val pendingResult = goAsync()
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val unfired = scheduledBeepDao.getUnfired().first()
+                beepScheduler.rescheduleUnfiredBeeps(unfired)
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 }
