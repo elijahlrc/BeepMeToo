@@ -16,6 +16,8 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -84,4 +86,20 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Testing - local JVM
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
+
+    // Testing - instrumented
+    androidTestImplementation(libs.androidx.junit.ext)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.arch.core.testing)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.turbine)
+    androidTestImplementation(libs.truth)
 }
